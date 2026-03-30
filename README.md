@@ -43,7 +43,7 @@ npm --prefix server install
 Create `.env` in the project root from `.env.example`:
 
 ```bash
-EXPO_PUBLIC_API_URL=http://10.0.2.2:8787
+EXPO_PUBLIC_API_URL=https://android-ai-clipart-generator.onrender.com
 ```
 
 Create `server/.env` from `server/.env.example` and add your OpenAI key:
@@ -68,7 +68,7 @@ npm run dev:server
 npm start
 ```
 
-For an Android emulator, `10.0.2.2` works as the API host. For a physical device, set `EXPO_PUBLIC_API_URL` to your deployed backend URL.
+For an Android emulator, `10.0.2.2` works only for a local backend. This project is currently configured to use the deployed backend at `https://android-ai-clipart-generator.onrender.com`.
 
 ## Android build
 
@@ -94,7 +94,7 @@ Replace these placeholders before submitting:
 
 - APK download link: `TODO_ADD_GOOGLE_DRIVE_APK_LINK`
 - Screen recording link: `TODO_ADD_GOOGLE_DRIVE_RECORDING_LINK`
-- GitHub repository: `TODO_ADD_GITHUB_REPO_LINK`
+- GitHub repository: `https://github.com/Sonuanand07/android-ai-clipart-generator`
 
 ## README submission notes
 
@@ -129,4 +129,4 @@ Low-cost options for the backend:
 - Fly.io small instance
 - Any lightweight VPS with HTTPS in front
 
-For the final submission, deploy the backend, set `EXPO_PUBLIC_API_URL` to the live URL, build the APK, upload the APK + screen recording to Drive, and replace the placeholder links above.
+For the final submission, this project is already configured to use the live backend URL `https://android-ai-clipart-generator.onrender.com`. Build the APK, upload the APK + screen recording to Drive, and replace the remaining placeholder links above.

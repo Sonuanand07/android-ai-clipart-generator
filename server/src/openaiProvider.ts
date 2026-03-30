@@ -54,6 +54,12 @@ export async function generateStyledClipart({
       payload && typeof payload.error?.message === 'string'
         ? payload.error.message
         : 'OpenAI image generation failed.';
+    if (/billing hard limit/i.test(errorMessage)) {
+      throw new Error(
+        'The AI provider account has reached its billing limit. Add credits or switch to another API key, then retry generation.',
+      );
+    }
+
     throw new Error(errorMessage);
   }
 
@@ -70,4 +76,5 @@ export async function generateStyledClipart({
     revisedPrompt: prompt,
   };
 }
+
 

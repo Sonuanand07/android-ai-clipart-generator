@@ -31,6 +31,8 @@ yarn-error.*
 *.pem
 
 # local env files
+.env
+server/.env
 .env*.local
 
 # typescript
@@ -38,4 +40,6 @@ yarn-error.*
 
 # generated native folders
 /ios
-/android
+server/dist
+.gradle-user
+.npm-cache

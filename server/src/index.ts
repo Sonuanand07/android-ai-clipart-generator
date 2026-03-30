@@ -46,7 +46,7 @@ app.use(
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/health', (_req: Request, res: Response) => {
-  res.json({ ok: true, provider: 'openai', model: env.OPENAI_IMAGE_MODEL });
+  res.json({ ok: true, provider: 'gemini', model: env.GEMINI_IMAGE_MODEL });
 });
 
 app.post('/v1/generate', limiter, upload.single('image'), async (req: Request, res: Response) => {
@@ -84,7 +84,7 @@ app.post('/v1/generate', limiter, upload.single('image'), async (req: Request, r
     res.json({
       sessionId: `session_${Date.now()}`,
       generatedAt: new Date().toISOString(),
-      provider: 'openai',
+      provider: 'gemini',
       results,
     });
   } catch (error) {

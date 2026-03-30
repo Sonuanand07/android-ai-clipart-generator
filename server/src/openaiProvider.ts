@@ -1,6 +1,12 @@
+import { GoogleGenAI } from '@google/genai';
+
 import { env } from './config';
 import { buildPrompt } from './stylePrompts';
 import { ClipartIntensity, ClipartStyleId, ProviderResult } from './types';
+
+const ai = new GoogleGenAI({
+  apiKey: env.GEMINI_API_KEY,
+});
 
 type GenerateImageArgs = {
   fileBuffer: Buffer;
@@ -25,49 +31,43 @@ function toImageUrl(data: unknown) {
 
 export async function generateStyledClipart({
   fileBuffer,
-  fileName,
   mimeType,
   styleId,
   intensity,
   customPrompt,
 }: GenerateImageArgs): Promise<ProviderResult> {
-  const prompt = buildPrompt(styleId, intensity, customPrompt);
-  const file = new File([new Uint8Array(fileBuffer)], fileName, { type: mimeType });
-  const body = new FormData();
-  body.set('model', env.OPENAI_IMAGE_MODEL);
-  body.set('prompt', prompt);
-  body.set('size', '1024x1024');
-  body.set('image', file);
+  const prompt = `${buildPrompt(styleId, intensity, customPrompt)} Generate a final square image output.`;
 
-  const response = await fetch(`${env.OPENAI_BASE_URL}/images/edits`, {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${env.OPENAI_API_KEY}`,
+  const response = await ai.models.generateContent({
+    model: env.GEMINI_IMAGE_MODEL,
+    contents: [
+      { text: prompt },
+      {
+        inlineData: {
+          mimeType,
+          data: fileBuffer.toString('base64'),
+        },
+      },
+    ],
+    config: {
+      responseModalities: ['TEXT', 'IMAGE'],
     },
-    body,
   });
 
-  const payload = await response.json().catch(() => null);
-
-  if (!response.ok) {
-    const errorMessage =
-      payload && typeof payload.error?.message === 'string'
-        ? payload.error.message
-        : 'OpenAI image generation failed.';
-    if (/billing hard limit/i.test(errorMessage)) {
-      throw new Error(
-        'The AI provider account has reached its billing limit. Add credits or switch to another API key, then retry generation.',
-      );
-    }
-
-    throw new Error(errorMessage);
-  }
-
-  const candidate = payload?.data?.[0];
-  const imageUrl = toImageUrl(candidate?.url) ?? toImageUrl(candidate?.b64_json);
+  const parts = response.candidates?.[0]?.content?.parts ?? [];
+  const imagePart = parts.find((part) => part.inlineData?.data);
+  const imageUrl = toImageUrl(imagePart?.inlineData?.data);
 
   if (!imageUrl) {
-    throw new Error('The image provider returned an unsupported response payload.');
+    const textFeedback = parts
+      .map((part) => part.text)
+      .filter(Boolean)
+      .join(' ')
+      .trim();
+
+    throw new Error(
+      textFeedback || 'Gemini did not return an image. Try again with a clearer portrait.',
+    );
   }
 
   return {
@@ -76,5 +76,3 @@ export async function generateStyledClipart({
     revisedPrompt: prompt,
   };
 }
-
-

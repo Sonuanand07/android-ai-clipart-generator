@@ -5,7 +5,7 @@
   "scripts": {
     "start": "expo start",
     "android": "expo run:android",
-    "android:release": "cd android && gradlew.bat assembleRelease",
+    "android:release": "if not exist .tmp mkdir .tmp && set GRADLE_USER_HOME=%cd%\\.gradle-user && set TEMP=%cd%\\.tmp && set TMP=%cd%\\.tmp && cd android && gradlew.bat assembleRelease",
     "prepare:android": "expo prebuild --platform android",
     "dev:server": "npm --prefix server run dev",
     "build:server": "npm --prefix server run build",
